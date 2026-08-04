@@ -1,0 +1,16 @@
+modules = ["python-3.12", "nodejs-20", "postgresql-16"]
+
+run = "bash replit-start.sh"
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["bash", "replit-start.sh"]
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+[env]
+# Replit подставляет свой DATABASE_URL со схемой postgresql:// — приложение
+# приводит её к асинхронному драйверу само, см. backend/app/core/config.py.
+STATIC_DIR = "frontend/dist"

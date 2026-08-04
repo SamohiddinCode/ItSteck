@@ -4,11 +4,15 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-education_space}
+      POSTGRES_DB: ${POSTGRES_DB:-itstek}
+    # No published port on purpose: the other services reach this database over
+    # the Compose network, and publishing 5432 makes the stack refuse to start
+    # on any machine that already runs PostgreSQL. To reach it from the host,
+    # add docker-compose.dev.yml — see the README.
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-education_space}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-itstek}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -17,15 +21,31 @@ services:
   backend:
     build: ./backend
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-education_space}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-itstek}
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+      APP_ENV: ${APP_ENV:-development}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:${APP_PORT:-8080}}
+      # Seeded only when the users table is empty — see app/main.py.
+      FIRST_ADMIN_EMAIL: ${FIRST_ADMIN_EMAIL:-admin@itstek.com}
+      FIRST_ADMIN_PASSWORD: ${FIRST_ADMIN_PASSWORD:-admin123}
+      # Leave empty to disable lead notifications.
+      BOT_TOKEN: ${BOT_TOKEN:-}
+      CHAT_ID: ${CHAT_ID:-}
     depends_on:
       postgres:
         condition: service_healthy
     restart: unless-stopped
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      # Vite inlines these at build time, so they have to be build args.
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+        VITE_TELEGRAM_URL: ${VITE_TELEGRAM_URL:-https://t.me/itstek}
+        VITE_INSTAGRAM_URL: ${VITE_INSTAGRAM_URL:-https://instagram.com/itstek}
+        VITE_CONTACT_PHONE: ${VITE_CONTACT_PHONE:-+998920236090}
     depends_on:
       - backend
     restart: unless-stopped
@@ -43,3 +63,4 @@ services:
 
 volumes:
   postgres_data:
+

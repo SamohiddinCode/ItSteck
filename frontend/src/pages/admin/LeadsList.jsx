@@ -9,6 +9,8 @@ import Button from '@/components/ui/Button'
 import { Select } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Input'
 import { formatDateTime } from '@/utils/formatters'
+import { formatPhone } from '@/utils/phone'
+import { telegramLink } from '@/utils/telegram'
 import { Trash2, SlidersHorizontal } from 'lucide-react'
 
 const STATUSES = ['new', 'contacted', 'registered', 'rejected']
@@ -32,7 +34,15 @@ function StatusModal({ lead, onClose, onSave }) {
     <div className="flex flex-col gap-5">
       <div className="card p-4 bg-surface-2 flex flex-col gap-1">
         <p className="text-text font-medium">{lead.name}</p>
-        <p className="text-muted text-sm">{lead.phone}</p>
+        <a href={`tel:${lead.phone}`} className="text-muted text-sm hover:text-primary transition-colors w-fit">
+          {formatPhone(lead.phone)}
+        </a>
+        {lead.telegram_username && (
+          <a href={telegramLink(lead.telegram_username)} target="_blank" rel="noreferrer"
+            className="text-muted text-sm hover:text-primary transition-colors w-fit">
+            @{lead.telegram_username}
+          </a>
+        )}
         {lead.course_rel && <p className="text-primary text-sm">{lead.course_rel.title}</p>}
       </div>
       <Select label="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -93,7 +103,10 @@ export default function LeadsList() {
       render: (row) => (
         <div>
           <p className="font-medium text-text">{row.name}</p>
-          <p className="text-muted text-xs mt-0.5">{row.phone}</p>
+          <p className="text-muted text-xs mt-0.5 font-mono">{formatPhone(row.phone)}</p>
+          {row.telegram_username && (
+            <p className="text-primary/70 text-xs mt-0.5">@{row.telegram_username}</p>
+          )}
         </div>
       )
     },

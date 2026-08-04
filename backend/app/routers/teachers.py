@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import APIRouter, Query
 from app.schemas.teacher import TeacherOut, TeacherCreate, TeacherUpdate
 from app.services import teachers as teacher_service
@@ -18,7 +19,7 @@ async def list_teachers(
 
 
 @router.get("/{teacher_id}", response_model=TeacherOut)
-async def get_teacher(teacher_id: int, db: DBSession):
+async def get_teacher(teacher_id: UUID, db: DBSession):
     return await teacher_service.get_teacher(db, teacher_id)
 
 
@@ -28,10 +29,10 @@ async def create_teacher(data: TeacherCreate, db: DBSession, _: CurrentAdmin):
 
 
 @router.patch("/{teacher_id}", response_model=TeacherOut)
-async def update_teacher(teacher_id: int, data: TeacherUpdate, db: DBSession, _: CurrentAdmin):
+async def update_teacher(teacher_id: UUID, data: TeacherUpdate, db: DBSession, _: CurrentAdmin):
     return await teacher_service.update_teacher(teacher_id, data, db)
 
 
 @router.delete("/{teacher_id}", status_code=204)
-async def delete_teacher(teacher_id: int, db: DBSession, _: CurrentAdmin):
+async def delete_teacher(teacher_id: UUID, db: DBSession, _: CurrentAdmin):
     await teacher_service.delete_teacher(teacher_id, db)

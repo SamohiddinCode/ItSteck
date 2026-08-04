@@ -1,27 +1,32 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
+import Logo from '@/components/ui/Logo'
+import LangSwitcher from '@/components/ui/LangSwitcher'
+import SocialLinks from '@/components/ui/SocialLinks'
+import { useT } from '@/i18n'
 
 const links = [
-  { to: '/', label: 'Home' },
-  { to: '/courses', label: 'Courses' },
-  { to: '/apply', label: 'Apply Now' },
+  { to: '/', key: 'nav.home' },
+  { to: '/courses', key: 'nav.courses' },
+  { to: '/test', key: 'nav.test' },
+  { to: '/verify', key: 'nav.verify' },
+  { to: '/apply', key: 'nav.apply' },
 ]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const { pathname } = useLocation()
+  const t = useT()
 
   return (
-    <header className="fixed top-0 inset-x-0 z-40 bg-bg/80 backdrop-blur-md border-b border-border/50">
+    // Positioning lives in PublicLayout, which stacks this under the promo ticker.
+    <header className="relative bg-bg/80 backdrop-blur-md border-b border-border/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
-            <BookOpen className="w-4 h-4 text-primary" />
-          </div>
-          <span className="font-display font-bold text-text text-lg">Education<span className="text-primary">Space</span></span>
+        <Link to="/" className="flex items-center group">
+          <Logo className="h-9 transition-opacity group-hover:opacity-80" />
         </Link>
 
         {/* Desktop nav */}
@@ -34,17 +39,18 @@ export default function Navbar() {
                 pathname === l.to ? 'text-text bg-surface-2' : 'text-muted hover:text-text hover:bg-surface-2/50'
               }`}
             >
-              {l.label}
+              {t(l.key)}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <LangSwitcher />
           <Link
             to="/apply"
             className="hidden md:inline-flex btn bg-primary hover:bg-primary-hover text-white h-9 px-5 text-sm rounded-xl"
           >
-            Get Started
+            {t('nav.getStarted')}
           </Link>
           <button onClick={() => setOpen(!open)} className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-text hover:bg-surface-2">
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -65,9 +71,10 @@ export default function Navbar() {
               {links.map((l) => (
                 <Link key={l.to} to={l.to} onClick={() => setOpen(false)}
                   className="px-4 py-3 rounded-xl text-sm font-medium text-muted hover:text-text hover:bg-surface-2 transition-colors">
-                  {l.label}
+                  {t(l.key)}
                 </Link>
               ))}
+              <SocialLinks className="px-4 pt-3 mt-2 border-t border-border/60" />
             </div>
           </motion.div>
         )}

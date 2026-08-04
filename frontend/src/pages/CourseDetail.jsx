@@ -4,8 +4,10 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, BookOpen } from 'lucide-react'
 import { courseService } from '@/services/courseService'
 import Spinner from '@/components/ui/Spinner'
+import { useT } from '@/i18n'
 
 export default function CourseDetail() {
+  const t = useT()
   const { id } = useParams()
   const [course, setCourse] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -21,8 +23,8 @@ export default function CourseDetail() {
   if (loading) return <div className="flex justify-center py-32"><Spinner size="lg" /></div>
   if (error || !course) return (
     <div className="text-center py-32">
-      <p className="text-muted mb-4">Course not found.</p>
-      <Link to="/courses" className="text-primary hover:text-primary-hover text-sm">← Back to courses</Link>
+      <p className="text-muted mb-4">{t('courseDetail.notFound')}</p>
+      <Link to="/courses" className="text-primary hover:text-primary-hover text-sm">{t('courseDetail.backLink')}</Link>
     </div>
   )
 
@@ -30,7 +32,7 @@ export default function CourseDetail() {
     <div className="max-w-4xl mx-auto px-6 py-16">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
         <Link to="/courses" className="inline-flex items-center gap-2 text-muted hover:text-text text-sm mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Courses
+          <ArrowLeft className="w-4 h-4" /> {t('courseDetail.back')}
         </Link>
 
         {course.image_url ? (
@@ -47,7 +49,7 @@ export default function CourseDetail() {
 
         <Link to={`/apply?course=${course.id}`}
           className="btn bg-primary hover:bg-primary-hover text-white h-12 px-8 text-base shadow-glow">
-          Apply for This Course →
+          {t('courseDetail.apply')} →
         </Link>
       </motion.div>
     </div>

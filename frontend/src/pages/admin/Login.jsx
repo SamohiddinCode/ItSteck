@@ -1,12 +1,16 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { BookMarked, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/features/auth/AuthContext'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import Logo from '@/components/ui/Logo'
+import LangSwitcher from '@/components/ui/LangSwitcher'
+import { useT } from '@/i18n'
 
 export default function Login() {
+  const t = useT()
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -19,14 +23,14 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e?.preventDefault()
-    if (!form.email || !form.password) return setError('Please fill in all fields.')
+    if (!form.email || !form.password) return setError(t('login.fillAll'))
     setError('')
     setLoading(true)
     try {
       await login(form.email, form.password)
       navigate(from, { replace: true })
     } catch (err) {
-      setError(err?.response?.data?.detail || 'Invalid credentials')
+      setError(err?.response?.data?.detail || t('login.invalid'))
     } finally {
       setLoading(false)
     }
@@ -39,6 +43,10 @@ export default function Login() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-primary/8 rounded-full blur-[100px]" />
       </div>
 
+      <div className="fixed top-4 right-4 z-10">
+        <LangSwitcher />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -46,30 +54,25 @@ export default function Login() {
         className="relative w-full max-w-sm"
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 justify-center mb-10">
-          <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
-            <BookMarked className="w-5 h-5 text-primary" />
-          </div>
-          <span className="font-display text-xl font-bold text-text">
-            Education<span className="text-primary">Space</span>
-          </span>
+        <div className="flex justify-center mb-10">
+          <Logo orientation="vertical" className="h-24" />
         </div>
 
         <div className="card p-8 glow-border">
-          <h1 className="font-display text-2xl font-bold text-text mb-1">Admin Login</h1>
-          <p className="text-muted text-sm mb-8">Sign in to manage your platform.</p>
+          <h1 className="font-display text-2xl font-bold text-text mb-1">{t('login.title')}</h1>
+          <p className="text-muted text-sm mb-8">{t('login.subtitle')}</p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <Input
-              label="Email"
+              label={t('login.email')}
               type="email"
-              placeholder="admin@educationspace.com"
+              placeholder="admin@itstek.com"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               autoFocus
             />
             <div className="flex flex-col gap-1.5">
-              <label className="label">Password</label>
+              <label className="label">{t('login.password')}</label>
               <div className="relative">
                 <input
                   type={showPass ? 'text' : 'password'}
@@ -93,13 +96,13 @@ export default function Login() {
             )}
 
             <Button type="submit" loading={loading} size="lg" className="w-full mt-1">
-              Sign In
+              {t('login.submit')}
             </Button>
           </form>
         </div>
 
         <p className="text-center text-muted/40 text-xs mt-6">
-          Education Space Admin Panel
+          {t('login.footer')}
         </p>
       </motion.div>
     </div>

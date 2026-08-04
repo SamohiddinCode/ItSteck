@@ -1,0 +1,19 @@
+# The host virtualenv must never reach the image — it holds binaries built for
+# the host's OS and architecture, and `COPY . .` would put them over the venv
+# that `uv sync` just created for Linux.
+.venv
+__pycache__
+**/__pycache__
+*.py[cod]
+
+.env
+.env.*
+!.env.example
+
+.git
+.gitignore
+Dockerfile
+.dockerignore
+.pytest_cache
+.ruff_cache
+.DS_Store

@@ -1,5 +1,6 @@
+import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, DateTime, Text, ForeignKey, Enum as SAEnum
+from sqlalchemy import String, DateTime, Text, ForeignKey, Uuid, Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 from app.core.database import Base
@@ -15,11 +16,18 @@ class LeadStatus(str, enum.Enum):
 class Lead(Base):
     __tablename__ = "leads"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     phone: Mapped[str] = mapped_column(String(50), nullable=False)
-    course_id: Mapped[int | None] = mapped_column(
-        ForeignKey("courses.id", ondelete="SET NULL"), nullable=True, index=True
+    # Optional — stored without the leading @.
+    telegram_username: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    course_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("courses.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
     )
     status: Mapped[LeadStatus] = mapped_column(
         SAEnum(LeadStatus), default=LeadStatus.new, nullable=False, index=True

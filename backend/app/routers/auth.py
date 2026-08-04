@@ -1,8 +1,8 @@
 from fastapi import APIRouter
-from app.schemas.user import LoginRequest, UserOut, UserCreate
+from app.schemas.user import LoginRequest, UserOut
 from app.schemas.token import Token
-from app.services.auth import login_user, create_user
-from app.core.deps import DBSession, CurrentAdmin
+from app.services.auth import login_user
+from app.core.deps import DBSession, CurrentStaff
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -12,7 +12,7 @@ async def login(data: LoginRequest, db: DBSession):
     return await login_user(data, db)
 
 
-@router.post("/users", response_model=UserOut, status_code=201)
-async def create_admin_user(data: UserCreate, db: DBSession, _: CurrentAdmin):
-    """Create a new admin/manager user. Requires admin role."""
-    return await create_user(data, db)
+@router.get("/me", response_model=UserOut)
+async def read_me(current_user: CurrentStaff):
+    """Identity and role of the signed-in user — drives what the panel shows."""
+    return current_user

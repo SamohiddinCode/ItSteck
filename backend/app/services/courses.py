@@ -1,3 +1,4 @@
+from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from fastapi import HTTPException, status
@@ -27,7 +28,7 @@ async def get_courses(
     return PagedResponse.create(items=courses, total=total, params=params, item_schema=CourseOut)
 
 
-async def get_course(db: AsyncSession, course_id: int) -> Course:
+async def get_course(db: AsyncSession, course_id: UUID) -> Course:
     result = await db.execute(select(Course).where(Course.id == course_id))
     course = result.scalar_one_or_none()
     if not course:
@@ -43,7 +44,7 @@ async def create_course(data: CourseCreate, db: AsyncSession) -> Course:
     return course
 
 
-async def update_course(course_id: int, data: CourseUpdate, db: AsyncSession) -> Course:
+async def update_course(course_id: UUID, data: CourseUpdate, db: AsyncSession) -> Course:
     course = await get_course(db, course_id)
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(course, field, value)
@@ -52,7 +53,7 @@ async def update_course(course_id: int, data: CourseUpdate, db: AsyncSession) ->
     return course
 
 
-async def delete_course(course_id: int, db: AsyncSession) -> None:
+async def delete_course(course_id: UUID, db: AsyncSession) -> None:
     course = await get_course(db, course_id)
     await db.delete(course)
     await db.flush()

@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, BookOpen } from 'lucide-react'
 import { truncate } from '@/utils/formatters'
+import { useT } from '@/i18n'
 
 export default function CourseCard({ course }) {
+  const t = useT()
+
   return (
     <Link to={`/courses/${course.id}`} className="group card p-6 flex flex-col gap-4 hover:border-primary/30 hover:shadow-glow-sm transition-all duration-300 block">
       {/* Image */}
@@ -21,7 +24,7 @@ export default function CourseCard({ course }) {
         <p className="text-muted text-sm leading-relaxed flex-1">{truncate(course.description, 100)}</p>
       </div>
       <div className="flex items-center gap-1.5 text-primary text-sm font-medium">
-        Learn more <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+        {t('courses.learnMore')} <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
       </div>
     </Link>
   )

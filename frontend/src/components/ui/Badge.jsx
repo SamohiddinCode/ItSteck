@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import { statusColors } from '@/utils/formatters'
+import { useT } from '@/i18n'
 
 const variants = {
   default: 'bg-surface-2 text-muted',
@@ -19,12 +20,12 @@ export default function Badge({ children, variant = 'default', className }) {
 }
 
 export function StatusBadge({ status }) {
+  const t = useT()
   const colors = statusColors[status] || statusColors.new
-  const labels = { new: 'New', contacted: 'Contacted', registered: 'Registered', rejected: 'Rejected' }
   return (
     <span className={clsx('badge', colors.bg, colors.text)}>
       <span className={clsx('w-1.5 h-1.5 rounded-full', colors.dot)} />
-      {labels[status] || status}
+      {t(`statuses.${status}`)}
     </span>
   )
 }

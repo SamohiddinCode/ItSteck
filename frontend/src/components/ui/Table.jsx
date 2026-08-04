@@ -1,7 +1,11 @@
 import clsx from 'clsx'
 import Spinner from './Spinner'
+import { useT } from '@/i18n'
 
-export default function Table({ columns, data, loading, emptyText = 'No records found' }) {
+export default function Table({ columns, data, loading, emptyText }) {
+  const t = useT()
+  const empty = emptyText ?? t('common.noRecords')
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -20,7 +24,7 @@ export default function Table({ columns, data, loading, emptyText = 'No records 
               <Spinner className="mx-auto" />
             </td></tr>
           ) : data.length === 0 ? (
-            <tr><td colSpan={columns.length} className="text-center py-16 text-muted">{emptyText}</td></tr>
+            <tr><td colSpan={columns.length} className="text-center py-16 text-muted">{empty}</td></tr>
           ) : (
             data.map((row, i) => (
               <tr key={row.id ?? i} className="border-b border-border/50 hover:bg-surface-2/50 transition-colors">

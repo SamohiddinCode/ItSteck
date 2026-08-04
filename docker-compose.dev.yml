@@ -1,0 +1,11 @@
+# Наложение для гибридного режима: открывает порт базы на хост, чтобы бэкенд,
+# запущенный локально, мог до неё достучаться.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d postgres
+#
+# Порт задаётся через POSTGRES_PORT в .env — берите свободный, если на машине
+# уже стоит PostgreSQL. Слушает только 127.0.0.1, наружу база не торчит.
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"

@@ -35,7 +35,9 @@ export default function Modal({ open, onClose, title, children, size = 'md' }) {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-6">{children}</div>
+            {/* Tall forms (e.g. a long subject list) scroll instead of
+                overflowing the viewport. */}
+            <div className="p-6 max-h-[70vh] overflow-y-auto">{children}</div>
           </motion.div>
         </div>
       )}

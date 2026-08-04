@@ -36,6 +36,8 @@ export default {
         'fade-up': 'fadeUp 0.5s ease forwards',
         'fade-in': 'fadeIn 0.4s ease forwards',
         pulse2: 'pulse2 2s cubic-bezier(0.4,0,0.6,1) infinite',
+        // Duration is set per-instance from the content length — see PromoTicker.
+        marquee: 'marquee 30s linear infinite',
       },
       keyframes: {
         fadeUp: {
@@ -49,6 +51,11 @@ export default {
         pulse2: {
           '0%,100%': { opacity: 1 },
           '50%': { opacity: 0.4 },
+        },
+        // Half the track, because the ticker renders its items twice.
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
       },
     },

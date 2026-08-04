@@ -1,13 +1,21 @@
+const INTL_LOCALES = { ru: 'ru-RU', en: 'en-US', uz: 'uz-UZ' }
+
+// Kept in a module variable rather than passed to every call site — the i18n
+// provider updates it whenever the language changes.
+let intlLocale = INTL_LOCALES.ru
+
+export const setDateLocale = (lang) => { intlLocale = INTL_LOCALES[lang] || INTL_LOCALES.ru }
+
 export const formatDate = (dateStr) => {
   if (!dateStr) return '—'
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(intlLocale, {
     year: 'numeric', month: 'short', day: 'numeric',
   }).format(new Date(dateStr))
 }
 
 export const formatDateTime = (dateStr) => {
   if (!dateStr) return '—'
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(intlLocale, {
     year: 'numeric', month: 'short', day: 'numeric',
     hour: '2-digit', minute: '2-digit',
   }).format(new Date(dateStr))

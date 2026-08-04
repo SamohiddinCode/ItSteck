@@ -1,6 +1,6 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 from pydantic import field_validator
-from typing import List
+from typing import Annotated, List
 
 
 class Settings(BaseSettings):
@@ -12,7 +12,11 @@ class Settings(BaseSettings):
     )
 
     # Database
-    DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@postgres:5432/education_space"
+    DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@postgres:5432/itstek"
+
+    # Where the built frontend lives. Empty means "API only" — that is how the
+    # Docker image runs, with nginx serving the static files instead.
+    STATIC_DIR: str = ""
 
     # Security
     SECRET_KEY: str = "dev-secret-key-change-in-production"
@@ -20,7 +24,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     # Admin seed
-    FIRST_ADMIN_EMAIL: str = "admin@educationspace.com"
+    FIRST_ADMIN_EMAIL: str = "admin@itstek.com"
     FIRST_ADMIN_PASSWORD: str = "admin123"
 
     # Telegram
@@ -29,11 +33,28 @@ class Settings(BaseSettings):
 
     # App
     APP_ENV: str = "development"
-    CORS_ORIGINS: List[str] = [
+    # NoDecode keeps pydantic-settings from JSON-decoding the raw env value, so
+    # the validator below sees the string and can accept a comma-separated list.
+    CORS_ORIGINS: Annotated[List[str], NoDecode] = [
         "http://localhost",
         "http://localhost:3000",
         "http://localhost:5173",
     ]
+
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def force_async_driver(cls, v):
+        """Hosting platforms hand out a sync URL; this app needs the async one.
+
+        Replit, Render, Railway and Heroku all inject DATABASE_URL as
+        `postgres://…` or `postgresql://…`, which SQLAlchemy maps to psycopg2 —
+        and then every request fails with 'greenlet_spawn has not been called'.
+        """
+        if isinstance(v, str):
+            for prefix in ("postgresql://", "postgres://"):
+                if v.startswith(prefix):
+                    return "postgresql+psycopg://" + v[len(prefix):]
+        return v
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

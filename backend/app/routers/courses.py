@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import APIRouter, Query
 from app.schemas.course import CourseOut, CourseCreate, CourseUpdate
 from app.services import courses as course_service
@@ -20,7 +21,7 @@ async def list_courses(
 
 
 @router.get("/{course_id}", response_model=CourseOut)
-async def get_course(course_id: int, db: DBSession):
+async def get_course(course_id: UUID, db: DBSession):
     return await course_service.get_course(db, course_id)
 
 
@@ -30,10 +31,10 @@ async def create_course(data: CourseCreate, db: DBSession, _: CurrentAdmin):
 
 
 @router.patch("/{course_id}", response_model=CourseOut)
-async def update_course(course_id: int, data: CourseUpdate, db: DBSession, _: CurrentAdmin):
+async def update_course(course_id: UUID, data: CourseUpdate, db: DBSession, _: CurrentAdmin):
     return await course_service.update_course(course_id, data, db)
 
 
 @router.delete("/{course_id}", status_code=204)
-async def delete_course(course_id: int, db: DBSession, _: CurrentAdmin):
+async def delete_course(course_id: UUID, db: DBSession, _: CurrentAdmin):
     await course_service.delete_course(course_id, db)

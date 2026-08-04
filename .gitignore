@@ -27,4 +27,6 @@ dist/
 Thumbs.db
 
 # Alembic
-backend/alembic/versions/*.py
+# Migrations are source code — they must be committed so every environment can
+# replay the same schema history.
+!backend/alembic/versions/*.py

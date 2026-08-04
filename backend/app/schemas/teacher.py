@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -19,7 +20,7 @@ class TeacherUpdate(BaseModel):
 
 
 class TeacherOut(TeacherBase):
-    id: int
+    id: UUID
     created_at: datetime
     updated_at: datetime
 

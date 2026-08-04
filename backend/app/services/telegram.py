@@ -5,7 +5,12 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 
-async def send_lead_notification(name: str, phone: str, course_name: str | None) -> bool:
+async def send_lead_notification(
+    name: str,
+    phone: str,
+    course_name: str | None,
+    telegram_username: str | None = None,
+) -> bool:
     if not settings.BOT_TOKEN or not settings.CHAT_ID:
         logger.warning("Telegram BOT_TOKEN or CHAT_ID not configured — skipping")
         return False
@@ -15,8 +20,10 @@ async def send_lead_notification(name: str, phone: str, course_name: str | None)
         f"🔥 <b>New Lead</b>\n\n"
         f"👤 Name: {name}\n"
         f"📞 Phone: {phone}\n"
-        f"📚 Course: {course_display}"
     )
+    if telegram_username:
+        message += f"✈️ Telegram: @{telegram_username}\n"
+    message += f"📚 Course: {course_display}"
 
     url = f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage"
     payload = {
@@ -78,7 +85,7 @@ async def test_telegram() -> dict:
             # Try sending test message
             send = await client.post(
                 f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage",
-                json={"chat_id": settings.CHAT_ID, "text": "✅ Telegram test from EducationSpace API"},
+                json={"chat_id": settings.CHAT_ID, "text": "✅ Telegram test from ItStek API"},
             )
             send_data = send.json()
             return {

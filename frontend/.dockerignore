@@ -1,0 +1,17 @@
+# Never copy the host's install into the image: `COPY . .` would overwrite the
+# node_modules that `npm install` just built, and on a host that doesn't carry
+# the executable bit (Windows, a zip, an exFAT drive) the build then dies with
+# `sh: vite: Permission denied`.
+node_modules
+dist
+
+.env
+.env.*
+!.env.example
+
+.git
+.gitignore
+Dockerfile
+.dockerignore
+npm-debug.log*
+.DS_Store

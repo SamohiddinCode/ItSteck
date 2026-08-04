@@ -1,12 +1,15 @@
 [project]
-name = "education-space-backend"
+name = "itstek-backend"
 version = "0.1.0"
-description = "Education Space EdTech SaaS — FastAPI Backend"
+description = "ItStek EdTech SaaS — FastAPI Backend"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.32.0",
-    "sqlalchemy>=2.0.36",
+    # [asyncio] pulls in greenlet explicitly. SQLAlchemy only declares it for
+    # some platforms, so a plain install works in the Linux image but leaves a
+    # macOS arm64 checkout unable to start.
+    "sqlalchemy[asyncio]>=2.0.36",
     "alembic>=1.14.0",
     "psycopg[binary]>=3.2.3",
     "pydantic[email]>=2.10.0",
@@ -15,6 +18,7 @@ dependencies = [
     "bcrypt>=4.0.0",
     "python-multipart>=0.0.12",
     "httpx>=0.28.0",
+    "reportlab>=4.2.0",
 ]
 
 [build-system]

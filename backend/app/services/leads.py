@@ -1,3 +1,4 @@
+from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
@@ -9,7 +10,7 @@ from app.services.telegram import send_lead_notification
 from app.utils.pagination import PaginationParams, PagedResponse
 
 
-async def _get_lead_with_course(db: AsyncSession, lead_id: int) -> Lead:
+async def _get_lead_with_course(db: AsyncSession, lead_id: UUID) -> Lead:
     """Always loads course_rel eagerly to avoid MissingGreenlet."""
     result = await db.execute(
         select(Lead).options(selectinload(Lead.course_rel)).where(Lead.id == lead_id)
@@ -41,7 +42,7 @@ async def get_leads(
     return PagedResponse.create(items=leads, total=total, params=params, item_schema=LeadOut)
 
 
-async def get_lead(db: AsyncSession, lead_id: int) -> Lead:
+async def get_lead(db: AsyncSession, lead_id: UUID) -> Lead:
     return await _get_lead_with_course(db, lead_id)
 
 
@@ -61,12 +62,17 @@ async def create_lead(data: LeadCreate, db: AsyncSession) -> Lead:
     lead = await _get_lead_with_course(db, lead.id)
 
     # Fire Telegram notification (non-blocking — errors are logged, not raised)
-    await send_lead_notification(name=data.name, phone=data.phone, course_name=course_name)
+    await send_lead_notification(
+        name=data.name,
+        phone=data.phone,
+        course_name=course_name,
+        telegram_username=data.telegram_username,
+    )
 
     return lead
 
 
-async def update_lead(lead_id: int, data: LeadUpdate, db: AsyncSession) -> Lead:
+async def update_lead(lead_id: UUID, data: LeadUpdate, db: AsyncSession) -> Lead:
     lead = await _get_lead_with_course(db, lead_id)
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(lead, field, value)
@@ -74,7 +80,7 @@ async def update_lead(lead_id: int, data: LeadUpdate, db: AsyncSession) -> Lead:
     return await _get_lead_with_course(db, lead_id)
 
 
-async def update_lead_status(lead_id: int, data: LeadStatusUpdate, db: AsyncSession) -> Lead:
+async def update_lead_status(lead_id: UUID, data: LeadStatusUpdate, db: AsyncSession) -> Lead:
     lead = await _get_lead_with_course(db, lead_id)
     lead.status = data.status
     if data.notes is not None:
@@ -83,7 +89,7 @@ async def update_lead_status(lead_id: int, data: LeadStatusUpdate, db: AsyncSess
     return await _get_lead_with_course(db, lead_id)
 
 
-async def delete_lead(lead_id: int, db: AsyncSession) -> None:
+async def delete_lead(lead_id: UUID, db: AsyncSession) -> None:
     lead = await _get_lead_with_course(db, lead_id)
     await db.delete(lead)
     await db.flush()

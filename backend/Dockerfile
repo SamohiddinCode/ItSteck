@@ -3,6 +3,12 @@ FROM python:3.13-slim
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
+# DejaVu ships the Cyrillic coverage the certificate PDFs need; the standard
+# reportlab Type1 fonts are Latin-1 only.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Copy dependency files first for layer caching
