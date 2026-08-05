@@ -1,0 +1,31 @@
+# Blueprint для Render: один web-сервис из Dockerfile.web.
+# База не описана специально — бесплатный PostgreSQL у Render удаляется примерно
+# через месяц вместе с данными, поэтому DATABASE_URL берётся от Neon (neon.tech),
+# у которого free-тариф постоянный. Значение вписывается в дашборде.
+services:
+  - type: web
+    name: itstek
+    runtime: docker
+    dockerfilePath: ./Dockerfile.web
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      # Строка подключения от Neon. Схему postgresql:// приложение приводит
+      # к асинхронному драйверу само.
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: APP_ENV
+        value: production
+      # Задать ДО первого запуска: администратор создаётся один раз, пока
+      # таблица пользователей пуста.
+      - key: FIRST_ADMIN_EMAIL
+        sync: false
+      - key: FIRST_ADMIN_PASSWORD
+        sync: false
+      # Необязательные — уведомления о заявках.
+      - key: BOT_TOKEN
+        sync: false
+      - key: CHAT_ID
+        sync: false

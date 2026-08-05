@@ -1,0 +1,64 @@
+# Один образ на весь проект: фронтенд собирается и уезжает внутрь бэкенда,
+# который отдаёт его сам. Нужен там, где нет docker compose и дают ровно один
+# порт — Render, Koyeb, Fly, любая виртуалка.
+#
+#   docker build -f Dockerfile.web -t itstek-web .
+#   docker run -e DATABASE_URL=... -e SECRET_KEY=... -p 8000:8000 itstek-web
+
+# --- 1. Сборка фронтенда -----------------------------------------------------
+FROM node:20-alpine AS frontend
+WORKDIR /build
+
+COPY frontend/package*.json ./
+RUN npm install --no-audit --no-fund
+
+COPY frontend/ ./
+
+# Пути относительные, домен один и тот же — абсолютный URL API не нужен.
+ARG VITE_API_BASE_URL=/api
+ARG VITE_TELEGRAM_URL=https://t.me/itstek
+ARG VITE_INSTAGRAM_URL=https://instagram.com/itstek
+ARG VITE_CONTACT_PHONE=+998920236090
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL \
+    VITE_TELEGRAM_URL=$VITE_TELEGRAM_URL \
+    VITE_INSTAGRAM_URL=$VITE_INSTAGRAM_URL \
+    VITE_CONTACT_PHONE=$VITE_CONTACT_PHONE
+
+RUN npm run build
+
+# --- 2. Зависимости бэкенда --------------------------------------------------
+# Отдельным этапом, чтобы ни uv, ни его кеш не попали в финальный образ.
+FROM python:3.13-slim AS deps
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+WORKDIR /app
+COPY backend/pyproject.toml backend/uv.lock ./
+RUN uv sync --no-dev --frozen --no-cache
+
+# --- 3. Итоговый образ -------------------------------------------------------
+FROM python:3.13-slim
+
+# Кириллица в PDF-сертификатах: штатные шрифты reportlab только латинские.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+
+# Пользователь создаётся до копирования: `chown -R` после него переписал бы
+# каждый файл в новый слой и удвоил образ на весь размер venv.
+RUN adduser --disabled-password --gecos "" appuser
+WORKDIR /app
+
+# Виртуальное окружение переезжает по тому же пути — иначе ломаются шебанги.
+COPY --from=deps --chown=appuser:appuser /app/.venv /app/.venv
+COPY --chown=appuser:appuser backend/ ./
+COPY --from=frontend --chown=appuser:appuser /build/dist /app/static
+
+ENV PATH="/app/.venv/bin:$PATH" \
+    STATIC_DIR=/app/static \
+    PORT=8000
+
+USER appuser
+
+EXPOSE 8000
+
+# Хостинги подставляют свой $PORT, поэтому через shell-форму.
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT}

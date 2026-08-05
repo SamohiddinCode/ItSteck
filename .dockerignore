@@ -1,0 +1,19 @@
+# Контекст сборки Dockerfile.web — корень репозитория, поэтому .dockerignore
+# внутри backend/ и frontend/ здесь не действуют: нужен этот файл.
+# Без него в образ уезжает локальный backend/.venv с macOS-бинарниками и
+# ложится поверх того, что собрал uv для Linux.
+**/node_modules
+**/.venv
+**/__pycache__
+**/*.py[cod]
+frontend/dist
+
+.env
+.env.*
+!.env.example
+
+.git
+.gitignore
+.claude
+*.zip
+**/.DS_Store
