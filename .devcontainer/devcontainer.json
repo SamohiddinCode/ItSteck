@@ -1,0 +1,31 @@
+{
+  // Среда для GitHub Codespaces: поднимает весь стек из docker-compose.yml
+  // и отдаёт его на порту 8080. Нужна, чтобы демо работало в облаке —
+  // независимо от того, включён ли ноутбук.
+  "name": "ItStek",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  // Дефолтный образ Codespaces умеет Docker не на всех тарифах, поэтому
+  // docker-in-docker подключается явно: без него docker compose не запустится.
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": {
+      "label": "ItStek",
+      "onAutoForward": "notify"
+    }
+  },
+
+  // postStartCommand, а не postCreateCommand: выполняется при каждом запуске
+  // кодспейса, поэтому после остановки стек поднимается сам, без ручных команд.
+  "postStartCommand": "docker compose up -d --build",
+
+  // Два ядра — машина бесплатного тарифа. Больше запрашивать нельзя:
+  // Codespaces иначе выдаст платную.
+  "hostRequirements": {
+    "cpus": 2
+  }
+}
