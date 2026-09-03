@@ -48,12 +48,12 @@ export default function Navbar() {
 
         <div className="flex items-center gap-2">
           <LangSwitcher />
-          <Link
-            to="/apply"
+          <a
+            href="/#/apply"
             className="hidden lg:inline-flex btn bg-primary hover:bg-primary-hover text-white h-9 px-5 text-sm rounded-xl"
           >
             {t('nav.getStarted')}
-          </Link>
+          </a>
           <button onClick={() => setOpen(!open)} aria-label={open ? 'Закрыть меню' : 'Открыть меню'} aria-expanded={open} className="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-text hover:bg-surface-2">
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>

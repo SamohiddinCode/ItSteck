@@ -22,8 +22,8 @@ api.interceptors.response.use(
   (err) => {
     if (err.response?.status === 401) {
       localStorage.removeItem('access_token')
-      if (!window.location.pathname.startsWith('/admin/login')) {
-        window.location.href = '/admin/login'
+      if (!window.location.hash.startsWith('#/admin/login')) {
+        window.location.replace('/#/admin/login')
       }
     }
     return Promise.reject(err)

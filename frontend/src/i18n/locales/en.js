@@ -39,14 +39,14 @@ export default {
   },
 
   footer: {
-    rights: '© 2025 ItStek. All rights reserved.',
+    rights: '© 2026 ItStek. All rights reserved.',
     admin: 'Admin',
   },
 
   promo: { label: 'Current discounts' },
 
   landing: {
-    badge: 'Enrollments Open — 2025 Cohort',
+    badge: 'Enrollments Open — 2026 Cohort',
     titleBefore: 'Build Skills That',
     titleAccent: 'Actually',
     titleAfter: 'Matter',

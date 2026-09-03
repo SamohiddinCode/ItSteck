@@ -39,14 +39,14 @@ export default {
   },
 
   footer: {
-    rights: '© 2025 ItStek. Barcha huquqlar himoyalangan.',
+    rights: '© 2026 ItStek. Barcha huquqlar himoyalangan.',
     admin: 'Admin',
   },
 
   promo: { label: 'Amaldagi chegirmalar' },
 
   landing: {
-    badge: 'Qabul ochiq — 2025 oqimi',
+    badge: 'Qabul ochiq — 2026 oqimi',
     titleBefore: 'Kelajak uchun',
     titleAccent: 'haqiqiy',
     titleAfter: "ko'nikmalar",

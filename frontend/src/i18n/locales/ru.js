@@ -39,14 +39,14 @@ export default {
   },
 
   footer: {
-    rights: '© 2025 ItStek. Все права защищены.',
+    rights: '© 2026 ItStek. Все права защищены.',
     admin: 'Админ',
   },
 
   promo: { label: 'Действующие скидки' },
 
   landing: {
-    badge: 'Набор открыт — поток 2025',
+    badge: 'Набор открыт — поток 2026',
     titleBefore: 'Навыки, которые',
     titleAccent: 'действительно',
     titleAfter: 'нужны',
