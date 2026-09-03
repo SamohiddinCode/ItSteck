@@ -16,6 +16,7 @@ export default {
     courses: 'Курсы',
     verify: 'Проверка сертификата',
     test: 'Подбор курса',
+    business: 'Для бизнеса',
     apply: 'Оставить заявку',
     getStarted: 'Начать',
   },

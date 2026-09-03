@@ -16,6 +16,7 @@ export default {
     courses: 'Kurslar',
     verify: 'Sertifikatni tekshirish',
     test: 'Kurs tanlash',
+    business: 'Biznes uchun',
     apply: 'Ariza qoldirish',
     getStarted: 'Boshlash',
   },

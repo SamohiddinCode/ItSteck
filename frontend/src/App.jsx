@@ -14,6 +14,7 @@ import CourseDetail from '@/pages/CourseDetail'
 import Apply from '@/pages/Apply'
 import CareerTest from '@/pages/CareerTest'
 import Verify from '@/pages/Verify'
+import Business from '@/pages/Business'
 import NotFound from '@/pages/NotFound'
 
 // Admin pages
@@ -46,6 +47,7 @@ export default function App() {
               <Route path="/apply" element={<Apply />} />
               <Route path="/test" element={<CareerTest />} />
               <Route path="/verify" element={<Verify />} />
+              <Route path="/business" element={<Business />} />
             </Route>
 
             {/* Admin auth */}
