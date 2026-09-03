@@ -37,7 +37,12 @@ async def get_course(db: AsyncSession, course_id: UUID) -> Course:
 
 
 async def create_course(data: CourseCreate, db: AsyncSession) -> Course:
-    course = Course(**data.model_dump())
+    values = data.model_dump()
+    values["title"] = values["title"].strip()
+    values["description"] = values["description"].strip()
+    if values.get("image_url"):
+        values["image_url"] = str(values["image_url"])
+    course = Course(**values)
     db.add(course)
     await db.flush()
     await db.refresh(course)
@@ -46,7 +51,13 @@ async def create_course(data: CourseCreate, db: AsyncSession) -> Course:
 
 async def update_course(course_id: UUID, data: CourseUpdate, db: AsyncSession) -> Course:
     course = await get_course(db, course_id)
-    for field, value in data.model_dump(exclude_unset=True).items():
+    changes = data.model_dump(exclude_unset=True)
+    for field in ("title", "description"):
+        if field in changes and changes[field] is not None:
+            changes[field] = changes[field].strip()
+    if changes.get("image_url"):
+        changes["image_url"] = str(changes["image_url"])
+    for field, value in changes.items():
         setattr(course, field, value)
     await db.flush()
     await db.refresh(course)

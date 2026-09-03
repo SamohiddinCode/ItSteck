@@ -32,12 +32,12 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-0.5">
           {links.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 pathname === l.to ? 'text-text bg-surface-2' : 'text-muted hover:text-text hover:bg-surface-2/50'
               }`}
             >
@@ -50,11 +50,11 @@ export default function Navbar() {
           <LangSwitcher />
           <Link
             to="/apply"
-            className="hidden md:inline-flex btn bg-primary hover:bg-primary-hover text-white h-9 px-5 text-sm rounded-xl"
+            className="hidden lg:inline-flex btn bg-primary hover:bg-primary-hover text-white h-9 px-5 text-sm rounded-xl"
           >
             {t('nav.getStarted')}
           </Link>
-          <button onClick={() => setOpen(!open)} className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-text hover:bg-surface-2">
+          <button onClick={() => setOpen(!open)} aria-label={open ? 'Закрыть меню' : 'Открыть меню'} aria-expanded={open} className="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-text hover:bg-surface-2">
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
@@ -67,7 +67,7 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-border bg-bg/95 overflow-hidden"
+            className="lg:hidden border-t border-border bg-bg/95 overflow-hidden"
           >
             <div className="px-4 py-4 flex flex-col gap-1">
               {links.map((l) => (

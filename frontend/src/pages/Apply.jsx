@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useSearchParams, useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Phone } from 'lucide-react'
 import { courseService } from '@/services/courseService'
@@ -27,6 +27,7 @@ export default function Apply() {
   // Errors hold translation keys, so they follow a language switch.
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
+  const [consent, setConsent] = useState(false)
 
   useEffect(() => {
     courseService.list({ active_only: true, size: 100 })
@@ -111,7 +112,11 @@ export default function Apply() {
             </Select>
           )}
           {errors.submit && <p className="text-sm text-danger">{t(errors.submit)}</p>}
-          <Button onClick={handleSubmit} loading={loading} size="lg" className="mt-2 w-full">
+          <label className="flex items-start gap-3 text-xs text-muted leading-relaxed cursor-pointer">
+            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 accent-violet-600" />
+            <span>Я согласен на обработку персональных данных и принимаю <Link to="/privacy" className="text-primary hover:underline">политику конфиденциальности</Link>.</span>
+          </label>
+          <Button onClick={handleSubmit} disabled={!consent} loading={loading} size="lg" className="mt-2 w-full">
             {t('apply.submit')}
           </Button>
         </div>

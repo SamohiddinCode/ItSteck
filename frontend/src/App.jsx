@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import { AuthProvider, useAuth, homeForRole } from '@/features/auth/AuthContext'
 import ProtectedRoute from '@/features/auth/ProtectedRoute'
 import { I18nProvider } from '@/i18n'
@@ -7,26 +8,26 @@ import { I18nProvider } from '@/i18n'
 import PublicLayout from '@/components/layout/PublicLayout'
 import AdminLayout from '@/components/layout/AdminLayout'
 
-// Public pages
-import Landing from '@/pages/Landing'
-import Courses from '@/pages/Courses'
-import CourseDetail from '@/pages/CourseDetail'
-import Apply from '@/pages/Apply'
-import CareerTest from '@/pages/CareerTest'
-import Verify from '@/pages/Verify'
-import Business from '@/pages/Business'
-import About from '@/pages/About'
-import NotFound from '@/pages/NotFound'
+const Landing = lazy(() => import('@/pages/Landing'))
+const Courses = lazy(() => import('@/pages/Courses'))
+const CourseDetail = lazy(() => import('@/pages/CourseDetail'))
+const Apply = lazy(() => import('@/pages/Apply'))
+const CareerTest = lazy(() => import('@/pages/CareerTest'))
+const Verify = lazy(() => import('@/pages/Verify'))
+const Business = lazy(() => import('@/pages/Business'))
+const About = lazy(() => import('@/pages/About'))
+const Legal = lazy(() => import('@/pages/Legal'))
+const NotFound = lazy(() => import('@/pages/NotFound'))
+const Login = lazy(() => import('@/pages/admin/Login'))
+const Dashboard = lazy(() => import('@/pages/admin/Dashboard'))
+const CoursesList = lazy(() => import('@/pages/admin/CoursesList'))
+const TeachersList = lazy(() => import('@/pages/admin/TeachersList'))
+const LeadsList = lazy(() => import('@/pages/admin/LeadsList'))
+const CertificatesList = lazy(() => import('@/pages/admin/CertificatesList'))
+const PromotionsList = lazy(() => import('@/pages/admin/PromotionsList'))
+const UsersList = lazy(() => import('@/pages/admin/UsersList'))
 
-// Admin pages
-import Login from '@/pages/admin/Login'
-import Dashboard from '@/pages/admin/Dashboard'
-import CoursesList from '@/pages/admin/CoursesList'
-import TeachersList from '@/pages/admin/TeachersList'
-import LeadsList from '@/pages/admin/LeadsList'
-import CertificatesList from '@/pages/admin/CertificatesList'
-import PromotionsList from '@/pages/admin/PromotionsList'
-import UsersList from '@/pages/admin/UsersList'
+const PageLoader = () => <div className="min-h-[45vh] grid place-items-center"><div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" /></div>
 
 /** Managers have no dashboard — they land straight on leads. */
 function AdminHome() {
@@ -39,7 +40,7 @@ export default function App() {
     <I18nProvider>
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
+          <Suspense fallback={<PageLoader />}><Routes>
             {/* Public */}
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Landing />} />
@@ -50,6 +51,8 @@ export default function App() {
               <Route path="/verify" element={<Verify />} />
               <Route path="/business" element={<Business />} />
               <Route path="/about" element={<About />} />
+              <Route path="/privacy" element={<Legal type="privacy" />} />
+              <Route path="/terms" element={<Legal type="terms" />} />
             </Route>
 
             {/* Admin auth */}
@@ -82,7 +85,7 @@ export default function App() {
 
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
-          </Routes>
+          </Routes></Suspense>
         </AuthProvider>
       </BrowserRouter>
     </I18nProvider>

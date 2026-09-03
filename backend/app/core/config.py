@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from typing import Annotated, List
 
 
@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "dev-secret-key-change-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    RATE_LIMIT_ENABLED: bool = True
 
     # Admin seed
     FIRST_ADMIN_EMAIL: str = "admin@itstek.com"
@@ -71,6 +72,15 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.APP_ENV == "production"
+
+    @model_validator(mode="after")
+    def validate_production_secrets(self):
+        if self.is_production:
+            if self.SECRET_KEY == "dev-secret-key-change-in-production" or len(self.SECRET_KEY) < 32:
+                raise ValueError("SECRET_KEY must be a unique value of at least 32 characters in production")
+            if self.FIRST_ADMIN_PASSWORD == "admin123" or len(self.FIRST_ADMIN_PASSWORD) < 12:
+                raise ValueError("FIRST_ADMIN_PASSWORD must be at least 12 characters in production")
+        return self
 
 
 settings = Settings()

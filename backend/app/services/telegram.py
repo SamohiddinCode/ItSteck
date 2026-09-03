@@ -1,5 +1,6 @@
 import httpx
 import logging
+from html import escape
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -15,14 +16,16 @@ async def send_lead_notification(
         logger.warning("Telegram BOT_TOKEN or CHAT_ID not configured — skipping")
         return False
 
-    course_display = course_name or "Not specified"
+    safe_name = escape(name)
+    safe_phone = escape(phone)
+    course_display = escape(course_name or "Not specified")
     message = (
         f"🔥 <b>New Lead</b>\n\n"
-        f"👤 Name: {name}\n"
-        f"📞 Phone: {phone}\n"
+        f"👤 Name: {safe_name}\n"
+        f"📞 Phone: {safe_phone}\n"
     )
     if telegram_username:
-        message += f"✈️ Telegram: @{telegram_username}\n"
+        message += f"✈️ Telegram: @{escape(telegram_username)}\n"
     message += f"📚 Course: {course_display}"
 
     url = f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage"
@@ -32,7 +35,7 @@ async def send_lead_notification(
         "parse_mode": "HTML",
     }
 
-    logger.info(f"Sending Telegram notification → chat_id={settings.CHAT_ID}")
+    logger.info("Sending Telegram lead notification")
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:

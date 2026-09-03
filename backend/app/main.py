@@ -2,7 +2,7 @@ import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -10,7 +10,8 @@ from app.core.config import settings
 from app.core.database import engine, AsyncSessionLocal, Base, ensure_database_exists
 from app.core.security import hash_password
 from app.middleware.cors import setup_cors
-from app.models import User, UserRole
+from app.middleware.security import RateLimitMiddleware, SecurityHeadersMiddleware
+from app.models import User, UserRole, Course
 from app.routers import (
     auth_router,
     users_router,
@@ -43,6 +44,27 @@ async def seed_admin():
             logger.info(f"✓ Admin user seeded: {settings.FIRST_ADMIN_EMAIL}")
 
 
+async def seed_catalog():
+    """Give a fresh installation a useful public catalog without overwriting
+    anything an administrator has already created."""
+    from sqlalchemy import select, func
+    async with AsyncSessionLocal() as session:
+        count = (await session.execute(select(func.count(Course.id)))).scalar_one()
+        if count:
+            return
+        items = [
+            ("Frontend-разработчик (React & TypeScript)", "Создание современных веб-приложений и интерактивных интерфейсов с React, TypeScript, Tailwind CSS, Git и практикой на реальных проектах."),
+            ("Backend-разработчик (Node.js & PostgreSQL)", "Серверная разработка, базы данных, REST API, авторизация, архитектура сервисов и безопасная работа с PostgreSQL."),
+            ("Python & AI Engineering", "Python, FastAPI, Telegram-боты, интеграция нейросетей, автоматизация рабочих процессов и основы Data Science."),
+            ("UI/UX & Product Design", "UX-исследования, интерфейсы в Figma, дизайн-системы, прототипирование и продуктовый подход."),
+            ("QA Engineer", "Ручное тестирование веб- и мобильных приложений, тест-дизайн, Postman, SQL, DevTools и работа с баг-трекерами."),
+            ("Кибербезопасность & Ethical Hacking", "Защита сетей и серверов, Linux, анализ трафика, поиск уязвимостей и основы безопасного тестирования."),
+        ]
+        session.add_all([Course(title=title, description=description, is_active=True) for title, description in items])
+        await session.commit()
+        logger.info("✓ Seeded %d starter courses", len(items))
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting ItStek API...")
@@ -51,6 +73,7 @@ async def lifespan(app: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
         logger.info("✓ Database tables created")
     await seed_admin()
+    await seed_catalog()
     logger.info("✓ Application ready")
     yield
     await engine.dispose()
@@ -61,13 +84,15 @@ app = FastAPI(
     title="ItStek API",
     version="1.0.0",
     # Served under /api/ so nginx (which proxies only /api/ to the backend) exposes them.
-    docs_url="/api/docs",
-    redoc_url="/api/redoc",
-    openapi_url="/api/openapi.json",
+    docs_url=None if settings.is_production else "/api/docs",
+    redoc_url=None if settings.is_production else "/api/redoc",
+    openapi_url=None if settings.is_production else "/api/openapi.json",
     lifespan=lifespan,
 )
 
 setup_cors(app)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RateLimitMiddleware)
 
 app.include_router(auth_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
@@ -83,6 +108,12 @@ app.include_router(promotions_router, prefix="/api")
 @app.get("/api/health")
 async def health_check():
     return JSONResponse({"status": "ok", "service": "itstek-api"})
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled error on %s %s", request.method, request.url.path)
+    return JSONResponse({"detail": "Internal server error"}, status_code=500)
 
 
 # --- Single-process mode -----------------------------------------------------

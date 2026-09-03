@@ -22,7 +22,11 @@ async def list_courses(
 
 @router.get("/{course_id}", response_model=CourseOut)
 async def get_course(course_id: UUID, db: DBSession):
-    return await course_service.get_course(db, course_id)
+    course = await course_service.get_course(db, course_id)
+    if not course.is_active:
+        from fastapi import HTTPException, status
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Course not found")
+    return course
 
 
 @router.post("", response_model=CourseOut, status_code=201)

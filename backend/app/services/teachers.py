@@ -25,7 +25,12 @@ async def get_teacher(db: AsyncSession, teacher_id: UUID) -> Teacher:
 
 
 async def create_teacher(data: TeacherCreate, db: AsyncSession) -> Teacher:
-    teacher = Teacher(**data.model_dump())
+    values = data.model_dump()
+    values["name"] = values["name"].strip()
+    values["bio"] = values["bio"].strip()
+    if values.get("photo_url"):
+        values["photo_url"] = str(values["photo_url"])
+    teacher = Teacher(**values)
     db.add(teacher)
     await db.flush()
     await db.refresh(teacher)
@@ -34,7 +39,13 @@ async def create_teacher(data: TeacherCreate, db: AsyncSession) -> Teacher:
 
 async def update_teacher(teacher_id: UUID, data: TeacherUpdate, db: AsyncSession) -> Teacher:
     teacher = await get_teacher(db, teacher_id)
-    for field, value in data.model_dump(exclude_unset=True).items():
+    changes = data.model_dump(exclude_unset=True)
+    for field in ("name", "bio"):
+        if field in changes and changes[field] is not None:
+            changes[field] = changes[field].strip()
+    if changes.get("photo_url"):
+        changes["photo_url"] = str(changes["photo_url"])
+    for field, value in changes.items():
         setattr(teacher, field, value)
     await db.flush()
     await db.refresh(teacher)

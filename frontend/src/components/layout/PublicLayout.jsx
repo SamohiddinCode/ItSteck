@@ -33,6 +33,8 @@ export default function PublicLayout() {
           </div>
           <div className="flex items-center gap-6">
             <SocialLinks />
+            <a href="/privacy" className="text-muted/60 text-xs hover:text-muted transition-colors">Конфиденциальность</a>
+            <a href="/terms" className="text-muted/60 text-xs hover:text-muted transition-colors">Условия</a>
             <a href="/admin/login" className="text-muted/50 text-xs hover:text-muted transition-colors">
               {t('footer.admin')}
             </a>
