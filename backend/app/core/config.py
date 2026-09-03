@@ -34,6 +34,7 @@ class Settings(BaseSettings):
 
     # App
     APP_ENV: str = "development"
+    PUBLIC_SITE_URL: str = "http://localhost:5173"
     # NoDecode keeps pydantic-settings from JSON-decoding the raw env value, so
     # the validator below sees the string and can accept a comma-separated list.
     CORS_ORIGINS: Annotated[List[str], NoDecode] = [

@@ -1,9 +1,10 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Query
 from fastapi.responses import Response
 
 from app.core.deps import DBSession, CurrentAdmin
+from app.core.config import settings
 from app.schemas.certificate import (
     CertificateOut,
     CertificateCreate,
@@ -39,7 +40,7 @@ async def verify_certificate(code: str, db: DBSession):
 
 @router.get("/verify/{code}/pdf", response_class=Response)
 async def certificate_pdf(
-    code: str, request: Request, db: DBSession, download: bool = Query(False)
+    code: str, db: DBSession, download: bool = Query(False)
 ):
     """Public endpoint — the certificate itself, rendered on demand."""
     certificate = await certificate_service.get_by_code(db, code)
@@ -49,7 +50,9 @@ async def certificate_pdf(
         course_title=certificate.course_title,
         subjects=certificate.subjects,
         issued_at=certificate.issued_at,
-        verify_url=f"{str(request.base_url).rstrip('/')}/verify",
+        verify_url=(
+            f"{settings.PUBLIC_SITE_URL.rstrip('/')}/#/verify?code={certificate.code}"
+        ),
     )
     disposition = "attachment" if download else "inline"
     return Response(

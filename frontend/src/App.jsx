@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import { AuthProvider, useAuth, homeForRole } from '@/features/auth/AuthContext'
 import ProtectedRoute from '@/features/auth/ProtectedRoute'
@@ -38,7 +38,7 @@ function AdminHome() {
 export default function App() {
   return (
     <I18nProvider>
-      <BrowserRouter>
+      <HashRouter>
         <AuthProvider>
           <Suspense fallback={<PageLoader />}><Routes>
             {/* Public */}
@@ -87,7 +87,7 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Routes></Suspense>
         </AuthProvider>
-      </BrowserRouter>
+      </HashRouter>
     </I18nProvider>
   )
 }

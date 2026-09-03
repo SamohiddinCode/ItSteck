@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom'
+import { Link, Outlet } from 'react-router-dom'
 import { Phone } from 'lucide-react'
 import Navbar from './Navbar'
 import PromoTicker from '@/components/ui/PromoTicker'
@@ -33,11 +33,11 @@ export default function PublicLayout() {
           </div>
           <div className="flex items-center gap-6">
             <SocialLinks />
-            <a href="/privacy" className="text-muted/60 text-xs hover:text-muted transition-colors">Конфиденциальность</a>
-            <a href="/terms" className="text-muted/60 text-xs hover:text-muted transition-colors">Условия</a>
-            <a href="/admin/login" className="text-muted/50 text-xs hover:text-muted transition-colors">
+            <Link to="/privacy" className="text-muted/60 text-xs hover:text-muted transition-colors">Конфиденциальность</Link>
+            <Link to="/terms" className="text-muted/60 text-xs hover:text-muted transition-colors">Условия</Link>
+            <Link to="/admin/login" className="text-muted/50 text-xs hover:text-muted transition-colors">
               {t('footer.admin')}
-            </a>
+            </Link>
           </div>
         </div>
       </footer>
