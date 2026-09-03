@@ -17,6 +17,7 @@ export default {
     verify: 'Verify Certificate',
     test: 'Find your course',
     business: 'For Business',
+    about: 'About Us',
     apply: 'Apply Now',
     getStarted: 'Get Started',
   },

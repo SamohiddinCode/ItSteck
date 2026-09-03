@@ -12,6 +12,7 @@ const links = [
   { to: '/courses', key: 'nav.courses' },
   { to: '/test', key: 'nav.test' },
   { to: '/business', key: 'nav.business' },
+  { to: '/about', key: 'nav.about' },
   { to: '/verify', key: 'nav.verify' },
   { to: '/apply', key: 'nav.apply' },
 ]

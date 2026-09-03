@@ -17,6 +17,7 @@ export default {
     verify: 'Проверка сертификата',
     test: 'Подбор курса',
     business: 'Для бизнеса',
+    about: 'О нас',
     apply: 'Оставить заявку',
     getStarted: 'Начать',
   },
